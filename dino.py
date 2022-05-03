@@ -20,12 +20,17 @@ class Dino:
         self.y = 80
         self.texture_num = 0
         self.textures = []
+        self.animation_speed = 0.1
+        self.texture_float = 0
         self.preload_textures()
         self.set_texture()
         self.show()
 
     def update(self):
-        self.texture_num = (self.texture_num + 1) % 3
+        self.texture_float += self.animation_speed
+        if self.texture_float >= 3:
+            self.texture_float = 0
+        self.texture_num = int(self.texture_float)  # floor
 
     def show(self):
         self.set_texture()
