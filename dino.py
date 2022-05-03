@@ -136,8 +136,10 @@ class Score:
         label_width = self.label.get_rect().width
         screen.blit(self.label, (WIDTH - label_width - 10, 10))
 
-    def update(self):
-        pass
+    def update(self, loop: int):
+        self.act = loop // 10
+        if self.act > self.high_score:
+            self.high_score = self.act
 
 
 class Game:
@@ -193,7 +195,7 @@ def main():
             dino.show()
 
             # cactus
-            if loop == 0:
+            if loop % 100 == 0:
                 game.spawn_cactus()
 
             for cactus in game.obstacles:
@@ -205,7 +207,7 @@ def main():
                     game.over()
 
             # score
-            game.score.update()
+            game.score.update(loop)
             game.score.show()
 
         for event in pygame.event.get([pygame.QUIT, pygame.KEYDOWN]):
@@ -222,7 +224,6 @@ def main():
         pygame.display.update()
         dt = clock.tick(60) / 1000
         loop += 1
-        loop %= 100
 
 
 if __name__ == "__main__":
