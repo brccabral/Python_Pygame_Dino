@@ -18,20 +18,28 @@ class Dino:
         self.height = 44
         self.x = 10
         self.y = 80
+        self.texture_num = 0
+        self.textures = []
+        self.preload_textures()
         self.set_texture()
         self.show()
 
     def update(self):
-        pass
+        self.texture_num = (self.texture_num + 1) % 3
 
     def show(self):
+        self.set_texture()
         screen.blit(self.texture, (self.x, self.y))
 
+    def preload_textures(self):
+        for i in range(3):
+            path = os.path.join("assets", "images", f"dino{i}.png")
+            texture = pygame.image.load(path)
+            texture = pygame.transform.scale(texture, (self.width, self.height))
+            self.textures.append(texture)
+
     def set_texture(self):
-        path = os.path.join("assets", "images", "dino0.png")
-        self.texture = pygame.image.load(path)
-        self.texture = pygame.transform.scale(self.texture, (self.width, self.height))
-        self.texture.convert_alpha()
+        self.texture = self.textures[self.texture_num]
 
 
 class BG:
@@ -71,6 +79,7 @@ class Game:
 
 def main():
     game = Game()
+    dino = game.dino
     dt = 0
 
     while True:
@@ -80,7 +89,8 @@ def main():
         game.bg.show()
 
         # dino
-        game.dino.show()
+        dino.update()
+        dino.show()
 
         for event in pygame.event.get([pygame.QUIT]):
             if event.type == pygame.QUIT:
