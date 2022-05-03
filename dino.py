@@ -146,7 +146,7 @@ class Score:
 
 
 class Game:
-    def __init__(self):
+    def __init__(self, high_score):
         self.bg = BG(0, 0)
         self.speed = 180
 
@@ -157,7 +157,7 @@ class Game:
         self.collision = Collision()
         self.is_playing = False
 
-        self.score = Score(0)
+        self.score = Score(high_score)
 
     def start(self):
         self.is_playing = True
@@ -190,11 +190,11 @@ class Game:
         self.obstacles.append(cactus)
 
     def reset(self):
-        self.__init__()
+        self.__init__(self.score.high_score)
 
 
 def main():
-    game = Game()
+    game = Game(0)
     dino = game.dino
     dt = 0
     loop = 0
@@ -234,12 +234,12 @@ def main():
                 if event.key == pygame.K_SPACE:
                     if not game.is_playing:
                         game.start()
+                        loop = 0
                     else:
                         dino.jump()
                 elif event.key == pygame.K_r:
                     game.reset()
                     dino = game.dino
-                    loop = 0
 
         pygame.display.update()
         dt = clock.tick(60) / 1000
