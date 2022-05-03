@@ -1,3 +1,4 @@
+from curses import KEY_DOWN
 import os
 import sys
 import pygame
@@ -18,19 +19,41 @@ class Dino:
         self.height = 44
         self.x = 10
         self.y = 80
+
+        # animation
         self.texture_num = 0
         self.textures = []
         self.animation_speed = 0.1
         self.texture_float = 0
+
+        # jump
+        self.dy = 3
+        self.gravity = 1.2
+        self.is_onground = True
+        self.is_jumping = False
+        self.is_falling = False
+        self.jump_stop = 10
+        self.fall_stop = self.y
+
         self.preload_textures()
         self.set_texture()
         self.show()
 
     def update(self):
-        self.texture_float += self.animation_speed
-        if self.texture_float >= 3:
-            self.texture_float = 0
-        self.texture_num = int(self.texture_float)  # floor
+        if self.is_jumping:
+            self.texture_num = 0
+            self.y -= self.dy
+            if self.y <= self.jump_stop:
+                self.fall()
+        elif self.is_falling:
+            self.y += self.gravity * self.dy
+            if self.y >= self.fall_stop:
+                self.stop_fall()
+        else:
+            self.texture_float += self.animation_speed
+            if self.texture_float >= 3:
+                self.texture_float = 0
+            self.texture_num = int(self.texture_float)  # round floor
 
     def show(self):
         self.set_texture()
@@ -45,6 +68,18 @@ class Dino:
 
     def set_texture(self):
         self.texture = self.textures[self.texture_num]
+
+    def jump(self):
+        self.is_jumping = True
+        self.is_onground = False
+
+    def fall(self):
+        self.is_jumping = False
+        self.is_falling = True
+
+    def stop_fall(self):
+        self.is_falling = False
+        self.is_onground = True
 
 
 class BG:
@@ -97,10 +132,14 @@ def main():
         dino.update()
         dino.show()
 
-        for event in pygame.event.get([pygame.QUIT]):
+        for event in pygame.event.get([pygame.QUIT, pygame.KEYDOWN]):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    if dino.is_onground:
+                        dino.jump()
 
         pygame.display.update()
         dt = clock.tick(60) / 1000
