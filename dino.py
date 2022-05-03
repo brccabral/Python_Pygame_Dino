@@ -124,6 +124,22 @@ class Collision:
         return distance < 35
 
 
+class Score:
+    def __init__(self, high_score: int):
+        self.high_score = high_score
+        self.act = 0
+        self.font = pygame.font.SysFont("monospace", 18)
+        self.show()
+
+    def show(self):
+        self.label = self.font.render(f"HI {self.high_score} {self.act}", True, "black")
+        label_width = self.label.get_rect().width
+        screen.blit(self.label, (WIDTH - label_width - 10, 10))
+
+    def update(self):
+        pass
+
+
 class Game:
     def __init__(self):
         self.bg = BG(0, 0)
@@ -135,6 +151,8 @@ class Game:
 
         self.collision = Collision()
         self.is_playing = False
+
+        self.score = Score(0)
 
     def start(self):
         self.is_playing = True
@@ -185,6 +203,10 @@ def main():
                 # collision
                 if game.collision.between(dino, cactus):
                     game.over()
+
+            # score
+            game.score.update()
+            game.score.show()
 
         for event in pygame.event.get([pygame.QUIT, pygame.KEYDOWN]):
             if event.type == pygame.QUIT:
