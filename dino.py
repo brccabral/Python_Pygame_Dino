@@ -34,15 +34,21 @@ class Dino:
         self.set_texture()
         self.show()
 
+    def jump(self):
+        self.gravity = -self.dy
+        self.texture_num = 0
+
     def update(self):
         self.gravity += 0.3
         self.y += self.gravity
+
         if self.y >= self.fall_stop:
             self.y = self.fall_stop
-        self.texture_float += self.animation_speed
-        if self.texture_float >= 3:
-            self.texture_float = 0
-        self.texture_num = int(self.texture_float)  # round floor
+
+            self.texture_float += self.animation_speed
+            if self.texture_float >= 3:
+                self.texture_float = 0
+            self.texture_num = int(self.texture_float)  # round floor
 
     def show(self):
         self.set_texture()
@@ -115,7 +121,7 @@ def main():
                 sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    dino.gravity = -dino.dy
+                    dino.jump()
 
         pygame.display.update()
         dt = clock.tick(60) / 1000
