@@ -10,6 +10,7 @@ WIDTH = 623
 HEIGHT = 150
 
 pygame.init()
+pygame.mixer.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Dino")
 clock = pygame.time.Clock()
@@ -54,6 +55,9 @@ class Dino:
         self.dy = 7
         self.gravity = 0
         self.fall_stop = self.y
+        self.jump_sound = pygame.mixer.Sound(
+            os.path.join("assets", "sounds", "jump.wav")
+        )
 
         self.preload_textures()
         self.set_texture()
@@ -62,6 +66,7 @@ class Dino:
     def jump(self):
         self.gravity = -self.dy
         self.texture_num = 0
+        self.jump_sound.play()
 
     def update(self):
         self.gravity += 0.3
@@ -129,6 +134,10 @@ class Score:
         self.high_score = high_score
         self.act = 0
         self.font = pygame.font.SysFont("monospace", 18)
+        self.point_sound = pygame.mixer.Sound(
+            os.path.join("assets", "sounds", "point.wav")
+        )
+        self.point_sound.set_volume(0.2)
         self.show()
 
     def show(self):
@@ -140,6 +149,8 @@ class Score:
         self.act = loop // 10
         if self.act > self.high_score:
             self.high_score = self.act
+        if self.act % 100 == 0 and self.act > 0:
+            self.point_sound.play()
 
     def reset(self):
         self.act = 0
@@ -158,6 +169,7 @@ class Game:
         self.is_playing = False
 
         self.score = Score(high_score)
+        self.die_sound = pygame.mixer.Sound(os.path.join("assets", "sounds", "die.wav"))
 
     def start(self):
         self.is_playing = True
@@ -174,6 +186,7 @@ class Game:
         screen.blit(
             self.small_label, ((WIDTH - self.small_label.get_width()) // 2, HEIGHT // 2)
         )
+        self.die_sound.play()
 
     def spawn_cactus(self):
         if self.obstacles:
