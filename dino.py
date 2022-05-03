@@ -12,6 +12,28 @@ pygame.display.set_caption("Dino")
 clock = pygame.time.Clock()
 
 
+class Dino:
+    def __init__(self):
+        self.width = 44
+        self.height = 44
+        self.x = 10
+        self.y = 80
+        self.set_texture()
+        self.show()
+
+    def update(self):
+        pass
+
+    def show(self):
+        screen.blit(self.texture, (self.x, self.y))
+
+    def set_texture(self):
+        path = os.path.join("assets", "images", "dino0.png")
+        self.texture = pygame.image.load(path)
+        self.texture = pygame.transform.scale(self.texture, (self.width, self.height))
+        self.texture.convert_alpha()
+
+
 class BG:
     def __init__(self, x: int, y: int):
         self.width = WIDTH
@@ -29,8 +51,9 @@ class BG:
 
     def set_texture(self):
         path = os.path.join("assets", "images", "bg.png")
-        self.texture = pygame.image.load(path).convert()
+        self.texture = pygame.image.load(path)
         self.texture = pygame.transform.scale(self.texture, (self.width, self.height))
+        self.texture.convert_alpha()
         self.surface.blit(self.texture, (0, 0))
         self.surface.blit(self.texture, (self.width, 0))
 
@@ -43,15 +66,21 @@ class Game:
         self.bg = BG(0, 0)
         self.speed = 120
 
+        self.dino = Dino()
+
 
 def main():
     game = Game()
     dt = 0
 
     while True:
+        # background
         screen.fill("black")
         game.bg.update(-game.speed * dt)
         game.bg.show()
+
+        # dino
+        game.dino.show()
 
         for event in pygame.event.get([pygame.QUIT]):
             if event.type == pygame.QUIT:
