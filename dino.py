@@ -1,3 +1,4 @@
+import math
 import os
 import random
 import sys
@@ -117,14 +118,29 @@ class BG:
         screen.blit(self.surface, (self.x, self.y))
 
 
+class Collision:
+    def between(self, obj1, obj2):
+        distance = math.sqrt((obj1.x - obj2.x) ** 2 + (obj1.y - obj2.y) ** 2)
+        return distance < 35
+
+
 class Game:
     def __init__(self):
         self.bg = BG(0, 0)
-        self.speed = 120
+        self.speed = 180
 
         self.dino = Dino()
 
         self.obstacles: List[Cactus] = []
+
+        self.collision = Collision()
+        self.is_playing = False
+
+    def start(self):
+        self.is_playing = True
+
+    def over(self):
+        self.is_playing = False
 
     def spawn_cactus(self):
         if self.obstacles:
@@ -148,22 +164,27 @@ def main():
     loop = 0
 
     while True:
-        # background
-        screen.fill("black")
-        game.bg.update(-game.speed * dt)
-        game.bg.show()
+        if game.is_playing:
+            # background
+            screen.fill("black")
+            game.bg.update(-game.speed * dt)
+            game.bg.show()
 
-        # dino
-        dino.update()
-        dino.show()
+            # dino
+            dino.update()
+            dino.show()
 
-        # cactus
-        if loop == 0:
-            game.spawn_cactus()
+            # cactus
+            if loop == 0:
+                game.spawn_cactus()
 
-        for cactus in game.obstacles:
-            cactus.update(-game.speed * dt)
-            cactus.show()
+            for cactus in game.obstacles:
+                cactus.update(-game.speed * dt)
+                cactus.show()
+
+                # collision
+                if game.collision.between(dino, cactus):
+                    game.over()
 
         for event in pygame.event.get([pygame.QUIT, pygame.KEYDOWN]):
             if event.type == pygame.QUIT:
@@ -171,7 +192,10 @@ def main():
                 sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    dino.jump()
+                    if not game.is_playing:
+                        game.start()
+                    else:
+                        dino.jump()
 
         pygame.display.update()
         dt = clock.tick(60) / 1000
