@@ -212,6 +212,7 @@ def main():
     dino = game.dino
     dt = 0
     loop = 0
+    over = False
 
     while True:
         if game.is_playing:
@@ -234,7 +235,10 @@ def main():
 
                 # collision
                 if game.collision.between(dino, cactus):
-                    game.over()
+                    over = True
+
+            if over:
+                game.over()
 
             # score
             game.score.update(loop)
@@ -246,14 +250,16 @@ def main():
                 sys.exit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    if not game.is_playing:
-                        game.start()
-                        loop = 0
-                    else:
-                        dino.jump()
+                    if not over:
+                        if not game.is_playing:
+                            game.start()
+                            loop = 0
+                        else:
+                            dino.jump()
                 elif event.key == pygame.K_r:
                     game.reset()
                     dino = game.dino
+                    over = False
 
         pygame.display.update()
         dt = clock.tick(60) / 1000
