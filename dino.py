@@ -164,6 +164,7 @@ class Game:
         self.dino = Dino()
 
         self.obstacles: List[Cactus] = []
+        self.spawn_cactus()
 
         self.collision = Collision()
         self.is_playing = False
