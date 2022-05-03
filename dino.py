@@ -129,10 +129,11 @@ class Game:
     def spawn_cactus(self):
         if self.obstacles:
             prev_cactus = self.obstacles[-1]
-            # 44 = dino width
             # 84 = minimum space between obstacles
             px = int(prev_cactus.x)
-            x = random.randint(px + 44 + 84, WIDTH + px + 44 + 84)
+            x = random.randint(
+                px + self.dino.width + 84, WIDTH + px + self.dino.width + 84
+            )
         else:
             x = random.randint(WIDTH + 100, WIDTH + 200)
 
