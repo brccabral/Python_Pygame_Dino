@@ -16,6 +16,7 @@ class BG:
     def __init__(self, x: int, y: int):
         self.width = WIDTH
         self.height = HEIGHT
+        self.surface = pygame.Surface((self.width * 2, self.height))
         self.x = x
         self.y = y
         self.set_texture()
@@ -23,20 +24,24 @@ class BG:
 
     def update(self, dx: float):
         self.x += dx
+        if self.x <= -WIDTH:
+            self.x = 0
 
     def set_texture(self):
         path = os.path.join("assets", "images", "bg.png")
         self.texture = pygame.image.load(path).convert()
         self.texture = pygame.transform.scale(self.texture, (self.width, self.height))
+        self.surface.blit(self.texture, (0, 0))
+        self.surface.blit(self.texture, (self.width, 0))
 
     def show(self):
-        screen.blit(self.texture, (self.x, self.y))
+        screen.blit(self.surface, (self.x, self.y))
 
 
 class Game:
     def __init__(self):
         self.bg = BG(0, 0)
-        self.speed = 60
+        self.speed = 120
 
 
 def main():
