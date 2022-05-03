@@ -1,5 +1,7 @@
 import os
+import random
 import sys
+from typing import List
 import pygame
 
 
@@ -10,6 +12,28 @@ pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Dino")
 clock = pygame.time.Clock()
+
+
+class Cactus:
+    def __init__(self, x: int):
+        self.width = 44
+        self.height = 44
+        self.x = x
+        self.y = 80
+        self.set_texture()
+        self.show()
+
+    def update(self, dx: float):
+        self.x += dx
+
+    def show(self):
+        screen.blit(self.texture, (self.x, self.y))
+
+    def set_texture(self):
+        path = os.path.join("assets", "images", "cactus.png")
+        self.texture = pygame.image.load(path)
+        self.texture = pygame.transform.scale(self.texture, (self.width, self.height))
+        self.texture.convert_alpha()
 
 
 class Dino:
@@ -59,6 +83,7 @@ class Dino:
             path = os.path.join("assets", "images", f"dino{i}.png")
             texture = pygame.image.load(path)
             texture = pygame.transform.scale(texture, (self.width, self.height))
+            texture.convert_alpha()
             self.textures.append(texture)
 
     def set_texture(self):
@@ -99,11 +124,27 @@ class Game:
 
         self.dino = Dino()
 
+        self.obstacles: List[Cactus] = []
+
+    def spawn_cactus(self):
+        if self.obstacles:
+            prev_cactus = self.obstacles[-1]
+            # 44 = dino width
+            # 84 = minimum space between obstacles
+            px = int(prev_cactus.x)
+            x = random.randint(px + 44 + 84, WIDTH + px + 44 + 84)
+        else:
+            x = random.randint(WIDTH + 100, WIDTH + 200)
+
+        cactus = Cactus(x)
+        self.obstacles.append(cactus)
+
 
 def main():
     game = Game()
     dino = game.dino
     dt = 0
+    loop = 0
 
     while True:
         # background
@@ -115,6 +156,14 @@ def main():
         dino.update()
         dino.show()
 
+        # cactus
+        if loop == 0:
+            game.spawn_cactus()
+
+        for cactus in game.obstacles:
+            cactus.update(-game.speed * dt)
+            cactus.show()
+
         for event in pygame.event.get([pygame.QUIT, pygame.KEYDOWN]):
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -125,6 +174,8 @@ def main():
 
         pygame.display.update()
         dt = clock.tick(60) / 1000
+        loop += 1
+        loop %= 100
 
 
 if __name__ == "__main__":
