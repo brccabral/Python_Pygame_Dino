@@ -141,6 +141,9 @@ class Score:
         if self.act > self.high_score:
             self.high_score = self.act
 
+    def reset(self):
+        self.act = 0
+
 
 class Game:
     def __init__(self):
@@ -161,6 +164,16 @@ class Game:
 
     def over(self):
         self.is_playing = False
+        big_font = pygame.font.SysFont("monospace", 24, bold=True)
+        small_font = pygame.font.SysFont("monospace", 18)
+        self.big_label = big_font.render("G A M E  O V E R", True, "black")
+        self.small_label = small_font.render("press r to reset", True, "black")
+        screen.blit(
+            self.big_label, ((WIDTH - self.big_label.get_width()) // 2, HEIGHT // 4)
+        )
+        screen.blit(
+            self.small_label, ((WIDTH - self.small_label.get_width()) // 2, HEIGHT // 2)
+        )
 
     def spawn_cactus(self):
         if self.obstacles:
@@ -175,6 +188,9 @@ class Game:
 
         cactus = Cactus(x)
         self.obstacles.append(cactus)
+
+    def reset(self):
+        self.__init__()
 
 
 def main():
@@ -220,6 +236,10 @@ def main():
                         game.start()
                     else:
                         dino.jump()
+                elif event.key == pygame.K_r:
+                    game.reset()
+                    dino = game.dino
+                    loop = 0
 
         pygame.display.update()
         dt = clock.tick(60) / 1000
